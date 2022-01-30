@@ -1,7 +1,9 @@
+import AppBar from "../components/AppBar"
+
 const MainLayout = () => {
   return (
     <div>
-      <h1>Hello world!</h1>
+      <AppBar />
     </div>
   )
 }

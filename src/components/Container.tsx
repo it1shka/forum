@@ -16,7 +16,6 @@ const OuterContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--lightgrey);
 `
 
 const InnerContainer = styled.div`

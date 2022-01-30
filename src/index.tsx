@@ -8,15 +8,24 @@ import store from './store';
 
 const GlobalStyle = createGlobalStyle`
   :root {
-    --lightgrey: #efefef;
     --grey: #cccccc;
     --darkgrey: #c5c5c5;
     --darkprimary: #361452;
     --primary: #632496;
   }
 
+  html {
+    background-color: #efefef;
+  }
+
   body {
     font-family: sans-serif;
+    color: #383838;
+    font-size: calc(1vw + 0.5em);
+
+    @media screen and (min-width: 50em) {
+      font-size: 1em;
+    }
   }
   
   * {
