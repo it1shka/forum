@@ -4,8 +4,8 @@ import PostContainer from "../components/PostContainer"
 import { AppDispatch, AppState } from "../store"
 import { setOpened, setPostContent, setTitle, setTopicId } from "../store/postform/actions"
 import { FormEvent, ChangeEvent, useEffect, useState } from 'react'
-import { Topic } from "../types"
-import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { Post, Topic } from "../types"
+import { addDoc, collection, getDocs, getFirestore, Timestamp } from 'firebase/firestore'
 
 const PostForm = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -48,14 +48,42 @@ const PostForm = () => {
     dispatch(setOpened(false))
   }
 
+  const user = useSelector((state: AppState) => {
+    return state.auth.user
+  })
+  const db = getFirestore()
+  const postCollection = collection(db, 'posts')
+
   const handleSubmitPost = (
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault()
+    if(topicId === null || user === null) {
+      alert('Error occured!')
+      return
+    }
+    const trimmedTitle = title.trim()
+    const trimmedContent = postContent.trim()
+
+    if(!trimmedTitle || !trimmedContent) {
+      alert('Empty post not allowed!')
+      return
+    }
+
+    const post: Post = {
+      title: trimmedTitle,
+      topicId: topicId,
+      postContent: trimmedContent,
+      authorUid: user.uid,
+      createdAt: Timestamp.now()
+    }
+    
+    addDoc(postCollection, post)
 
     dispatch(setTitle(''))
     dispatch(setTopicId(null))
     dispatch(setPostContent(''))
+    dispatch(setOpened(false))
   }
 
   const handleTitleChange = (
@@ -122,10 +150,29 @@ const PostForm = () => {
             spellCheck="false"
           ></PostInput>
         </Group>
+        
+        <PostButton type="submit">
+          Post!
+        </PostButton>
       </FormContainer>
     </PostContainer>
   )
 }
+
+const PostButton = styled.button`
+  padding: 0.25em;
+  font-size: 1.2em;
+  border: none;
+  color: grey;
+  font-weight: bold;
+  border-radius: 10px;
+  background-color: #efefef;
+
+  &:hover {
+    background-color: var(--grey);
+    color: black;
+  }
+`
 
 const baseInputCss = css`
   outline: none;
