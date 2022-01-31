@@ -1,6 +1,6 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { AppState } from '../store'
+import { AppDispatch, AppState, reset } from '../store'
 import defaultpp from '../images/defaultpp.png'
 import { getAuth, signOut } from 'firebase/auth'
 import { useState } from 'react'
@@ -10,9 +10,12 @@ const LoggedUser = () => {
     return state.auth.user
   })
 
+  const dispatch = useDispatch<AppDispatch>()
+
   const handleSignOut = () => {
     if(!window.confirm('Are you sure?')) 
       return
+    dispatch(reset())
     const auth = getAuth()
     signOut(auth).catch(() => {
       alert('Failed to sign out!')
