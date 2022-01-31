@@ -1,13 +1,29 @@
+import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
 import AppBar from "../components/AppBar"
 import Filters from "../components/Filters"
+import { AppDispatch, AppState } from "../store"
+import { setOpened } from "../store/postform/actions"
+import PostForm from "./PostForm"
 
 const MainLayout = () => {
+
+  const dispatch = useDispatch<AppDispatch>()
+
+  const openForm = () => {
+    dispatch(setOpened(true))
+  }
+
+  const opened = useSelector((state: AppState) => {
+    return state.postform.opened
+  })
+
   return (
     <div>
+      {opened && <PostForm />}
       <AppBar />
       <ContentContainer>
-        <PostButton>
+        <PostButton onClick={openForm}>
           Write your post!
         </PostButton>
         <Filters />
@@ -43,7 +59,7 @@ const ContentContainer = styled.div`
 
   overflow: hidden;
 
-  min-height: 200vh;
+  // min-height: 200vh;
 `
 
 export default MainLayout
