@@ -3,7 +3,7 @@ import { FormState, FormAction, FormActionType } from "./types";
 const formDefaultState: FormState = {
   opened: false,
   title: '',
-  topicId: null as unknown as string,
+  topicId: null,
   postContent: ''
 }
 

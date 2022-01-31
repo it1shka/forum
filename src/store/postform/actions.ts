@@ -19,7 +19,7 @@ export function setTitle(
 }
 
 export function setTopicId(
-  topicId: string
+  topicId: string | null
 ): FormSetTopicIdAction {
   return {
     type: FormActionType.SET_TOPIC_ID,

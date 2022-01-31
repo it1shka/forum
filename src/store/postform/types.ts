@@ -1,7 +1,7 @@
 export interface FormState {
   opened: boolean
   title: string
-  topicId: string
+  topicId: string | null
   postContent: string
 }
 
@@ -24,7 +24,7 @@ export interface FormSetTitleAction {
 
 export interface FormSetTopicIdAction {
   type: FormActionType.SET_TOPIC_ID
-  payload: string
+  payload: string | null
 }
 
 export interface FormSetPostContentAction {

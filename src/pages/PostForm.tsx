@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux"
 import styled, { css } from "styled-components"
 import PostContainer from "../components/PostContainer"
 import { AppDispatch, AppState } from "../store"
-import { setOpened, setTitle, setTopicId } from "../store/postform/actions"
+import { setOpened, setPostContent, setTitle, setTopicId } from "../store/postform/actions"
 import { FormEvent, ChangeEvent, useEffect, useState } from 'react'
 import { Topic } from "../types"
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
@@ -52,6 +52,10 @@ const PostForm = () => {
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault()
+
+    dispatch(setTitle(''))
+    dispatch(setTopicId(null))
+    dispatch(setPostContent(''))
   }
 
   const handleTitleChange = (
@@ -68,6 +72,13 @@ const PostForm = () => {
     dispatch(setTopicId(value))
   }
 
+  const handleContentChange = (
+    event: ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const value = event.target.value
+    dispatch(setPostContent(value))
+  }
+
   return (
     <PostContainer>
       <CloseButton onClick={closeForm}>
@@ -77,6 +88,7 @@ const PostForm = () => {
         <Group>
           <h3>Title:</h3>
           <TitleInput 
+            required
             placeholder="Your title..."
             value={title}
             onChange={handleTitleChange}
@@ -86,6 +98,7 @@ const PostForm = () => {
         <Group>
           <h3>Topic:</h3>
           <TopicInput 
+            required
             onChange={handleTopicChange}
             value={topicId || ''}
           >
@@ -101,7 +114,13 @@ const PostForm = () => {
 
         <Group style={{flex: '1'}}>
           <h3>Post:</h3>
-          <PostInput></PostInput>
+          <PostInput
+            required
+            value={postContent}
+            onChange={handleContentChange}
+            autoCorrect="false"
+            spellCheck="false"
+          ></PostInput>
         </Group>
       </FormContainer>
     </PostContainer>
