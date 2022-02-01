@@ -12,3 +12,9 @@ export interface Post {
   authorUid: string
   createdAt: Timestamp
 }
+
+export interface UserData {
+  displayName: string
+  email: string
+  photoURL: string | null
+}
