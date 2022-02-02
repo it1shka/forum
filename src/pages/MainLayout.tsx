@@ -1,26 +1,43 @@
-import { useDispatch, useSelector } from "react-redux"
+import { collection, getDocs, getFirestore } from "firebase/firestore"
+import { useEffect } from "react"
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import AppBar from "../components/AppBar"
 import Filters from "../components/Filters"
-import { AppDispatch, AppState } from "../store"
+import { AppDispatch } from "../store"
+import { setTopics } from "../store/feed/actions"
 import { setOpened } from "../store/postform/actions"
+import { Topic } from "../types"
 import PostForm from "./PostForm"
 
 const MainLayout = () => {
 
   const dispatch = useDispatch<AppDispatch>()
 
+  useEffect(() => {
+    const db = getFirestore()
+    const topicCollection = collection(db, 'topics')
+    getDocs(topicCollection).then(snapshot => {
+      const topics = snapshot.docs.map(doc => {
+        const topicId = doc.id
+        const topicName = doc.data().name
+        const topic: Topic = {
+          name: topicName,
+          id: topicId
+        }
+        return topic
+      })
+      dispatch(setTopics(topics))
+    }).catch(() => alert('Failed to load topics!'))
+  }, [])
+
   const openForm = () => {
     dispatch(setOpened(true))
   }
 
-  const opened = useSelector((state: AppState) => {
-    return state.postform.opened
-  })
-
   return (
     <div>
-      {opened && <PostForm />}
+      <PostForm />
       <AppBar />
       <ContentContainer>
         <PostButton onClick={openForm}>

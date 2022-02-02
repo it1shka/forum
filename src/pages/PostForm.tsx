@@ -3,46 +3,31 @@ import styled, { css } from "styled-components"
 import PostContainer from "../components/PostContainer"
 import { AppDispatch, AppState } from "../store"
 import { setOpened, setPostContent, setTitle, setTopicId } from "../store/postform/actions"
-import { FormEvent, ChangeEvent, useEffect, useState } from 'react'
-import { Post, Topic } from "../types"
-import { addDoc, collection, getDocs, getFirestore, Timestamp } from 'firebase/firestore'
+import { FormEvent, ChangeEvent, useEffect } from 'react'
+import { Post } from "../types"
+import { addDoc, collection, getFirestore, Timestamp } from 'firebase/firestore'
 
 const PostForm = () => {
   const dispatch = useDispatch<AppDispatch>()
   const {
     title, 
     topicId, 
-    postContent
+    postContent,
+    opened
   } = useSelector((state: AppState) => {
     return state.postform
   })
 
-  const [topics, setTopics] = useState<Topic[]>([])
+  const topics = useSelector((state: AppState) => {
+    return state.feed.topics
+  })
 
   useEffect(() => {
-    // fetching topics...
-    const db = getFirestore()
-    const topicCollection = collection(
-      db, 'topics'
-    )
-    getDocs(topicCollection).then(snapshot => {
-      const topics = snapshot.docs.map(doc => {
-        const topicId = doc.id
-        const topicName = doc.data().name
-        const topic: Topic = {
-          name: topicName,
-          id: topicId
-        }
-        return topic
-      })
-      setTopics(topics)
-      if(topicId === null) {
-        dispatch(setTopicId(topics[0].id))
-      }
-    }).catch(() => {
-      alert('Unable to load topics from DB!')
-    })
-  }, [])
+    if(!topicId) {
+      const newId = topics[0]?.id || null
+      dispatch(setTopicId(newId))
+    }
+  }, [topicId, topics])
 
   const closeForm = () => {
     dispatch(setOpened(false))
@@ -51,8 +36,6 @@ const PostForm = () => {
   const user = useSelector((state: AppState) => {
     return state.auth.user
   })
-  const db = getFirestore()
-  const postCollection = collection(db, 'posts')
 
   const handleSubmitPost = (
     event: FormEvent<HTMLFormElement>
@@ -65,7 +48,7 @@ const PostForm = () => {
     const trimmedTitle = title.trim()
     const trimmedContent = postContent.trim()
 
-    if(!trimmedTitle || !trimmedContent) {
+    if(!trimmedTitle || !trimmedContent || !topicId) {
       alert('Empty post not allowed!')
       return
     }
@@ -78,12 +61,14 @@ const PostForm = () => {
       createdAt: Timestamp.now()
     }
     
+    const db = getFirestore()
+    const postCollection = collection(db, 'posts')
     addDoc(postCollection, post)
 
     dispatch(setTitle(''))
     dispatch(setTopicId(null))
     dispatch(setPostContent(''))
-    dispatch(setOpened(false))
+    // dispatch(setOpened(false))
   }
 
   const handleTitleChange = (
@@ -108,7 +93,7 @@ const PostForm = () => {
   }
 
   return (
-    <PostContainer>
+    <PostContainer hidden={!opened}>
       <CloseButton onClick={closeForm}>
         Close
       </CloseButton>

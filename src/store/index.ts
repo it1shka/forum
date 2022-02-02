@@ -1,10 +1,12 @@
 import { combineReducers, createStore } from "redux";
 import authReducer from "./auth/reducer";
+import feedReducer from "./feed/reducer";
 import formReducer from "./postform/reducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  postform: formReducer
+  postform: formReducer,
+  feed: feedReducer
 })
 
 // making global reducer for state reset
