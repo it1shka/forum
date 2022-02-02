@@ -1,7 +1,10 @@
 import { FeedState, FeedAction, FeedActionType } from "./types";
 
 const feedDefaultState: FeedState = {
-  topics: []
+  topics: [],
+  selectedTopicId: '',
+  sortType: 'newest',
+  posts: []
 }
 
 const feedReducer = (
@@ -11,6 +14,12 @@ const feedReducer = (
   switch(action.type) {
     case FeedActionType.SET_TOPICS:
       return {...state, topics: action.payload}
+    case FeedActionType.SET_SELECTED_TOPIC_ID:
+      return {...state, selectedTopicId: action.payload}
+    case FeedActionType.SET_POSTS:
+      return {...state, posts: action.payload}
+    case FeedActionType.SET_SORT_TYPE:
+      return {...state, sortType: action.payload}
     default:
       return state
   }

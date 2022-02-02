@@ -1,25 +1,61 @@
+import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
+import { AppDispatch, AppState } from "../store"
+import type { ChangeEvent } from 'react'
+import { setSelectedTopicId, setSortType } from "../store/feed/actions"
+import { SortType } from "../store/feed/types"
 
 const Filters = () => {
+  const dispatch = useDispatch<AppDispatch>()
+  const {
+    selectedTopicId, 
+    sortType, 
+    topics
+  } = useSelector((state: AppState) => {
+    return state.feed
+  })
+
+  const onTopicChange = (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = event.target.value
+    dispatch(setSelectedTopicId(value))
+  }
+
+  const onSortTypeChange = (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = event.target.value
+    dispatch(setSortType(value as SortType))
+  }
+
   return (
     <Container>
       <h3>Select by: </h3>
       <Group>
         <p>Topic: </p>
-        <select>
-          <option>All</option>
-          <option>Mine</option>
-          <option>Music</option>
-          <option>Games</option>
-          <option>Sports</option>
+        <select
+          onChange={onTopicChange}
+          value={selectedTopicId}
+        >
+          <option value="">All</option>
+          {topics.map((topic, idx) => {
+            return (
+              <option key={idx} value={topic.id}>
+                {topic.name}
+              </option>
+            )
+          })}
         </select>
       </Group>
       <Group>
         <p>Order: </p>
-        <select>
-          <option>Newest</option>
-          <option>Oldest</option>
-          <option>Popularity</option>
+        <select 
+          onChange={onSortTypeChange} 
+          value={sortType}
+        >
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
         </select>
       </Group>
     </Container>
