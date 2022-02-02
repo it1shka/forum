@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
 import { AppDispatch, AppState } from "../store"
-import type { ChangeEvent } from 'react'
-import { setSelectedTopicId, setSortType } from "../store/feed/actions"
+import { ChangeEvent, useEffect } from 'react'
+import { setPosts, setSelectedTopicId, setSortType } from "../store/feed/actions"
 import { SortType } from "../store/feed/types"
+import { collection, getDocs, getFirestore, orderBy, query, where } from "firebase/firestore"
+import { Post } from "../types"
 
 const Filters = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -14,6 +16,34 @@ const Filters = () => {
   } = useSelector((state: AppState) => {
     return state.feed
   })
+
+  const db = getFirestore()
+  const postsCollection = collection(db, 'posts')
+  useEffect(() => {
+    let postsQuery = query(postsCollection)
+    if(selectedTopicId) {
+      postsQuery = query(
+        postsQuery, 
+        where('topicId', '==', selectedTopicId)
+      )
+    }
+    postsQuery = query(
+      postsQuery,
+      orderBy(
+        'createdAt', 
+        sortType === 'oldest'
+        ? 'asc'
+        : 'desc'
+      )
+    )
+    getDocs(postsQuery).then(snapshot => {
+      const posts = snapshot.docs.map(doc => {
+        return doc.data() as Post
+      })
+      console.log(posts)
+      dispatch(setPosts(posts))
+    }).catch(() => alert('Failed to load posts!'))
+  }, [sortType, selectedTopicId])
 
   const onTopicChange = (
     event: ChangeEvent<HTMLSelectElement>
