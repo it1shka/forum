@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import AppBar from "../components/AppBar"
 import Filters from "../components/Filters"
+import Posts from "../components/Posts"
 import { AppDispatch } from "../store"
 import { setTopics } from "../store/feed/actions"
 import { setOpened } from "../store/postform/actions"
@@ -44,6 +45,7 @@ const MainLayout = () => {
           Write your post!
         </PostButton>
         <Filters />
+        <Posts />
       </ContentContainer>
     </div>
   )

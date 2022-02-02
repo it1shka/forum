@@ -42,7 +42,10 @@ const Filters = () => {
       })
       console.log(posts)
       dispatch(setPosts(posts))
-    }).catch(() => alert('Failed to load posts!'))
+    }).catch(reason => {
+      console.error(reason)
+      alert('Failed to load posts!')
+    })
   }, [sortType, selectedTopicId])
 
   const onTopicChange = (

@@ -68,7 +68,7 @@ const PostForm = () => {
     dispatch(setTitle(''))
     dispatch(setTopicId(null))
     dispatch(setPostContent(''))
-    // dispatch(setOpened(false))
+    dispatch(setOpened(false))
   }
 
   const handleTitleChange = (
