@@ -20,3 +20,10 @@ export interface UserData {
   email: string
   photoURL: string | null
 }
+
+export interface Comment {
+  content: string
+  authorUid: string
+  postId: string
+  createdAt: Timestamp
+}

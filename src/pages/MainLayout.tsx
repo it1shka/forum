@@ -1,14 +1,15 @@
 import { collection, getDocs, getFirestore } from "firebase/firestore"
 import { useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
 import AppBar from "../components/AppBar"
 import Filters from "../components/Filters"
 import Posts from "../components/Posts"
-import { AppDispatch } from "../store"
+import { AppDispatch, AppState } from "../store"
 import { setTopics } from "../store/feed/actions"
 import { setOpened } from "../store/postform/actions"
 import { Topic } from "../types"
+import CommentsLayout from "./CommentsLayout"
 import PostForm from "./PostForm"
 
 const MainLayout = () => {
@@ -36,9 +37,14 @@ const MainLayout = () => {
     dispatch(setOpened(true))
   }
 
+  const areCommentsOpened = useSelector((state: AppState) => {
+    return state.comments.opened
+  })
+
   return (
     <div>
       <PostForm />
+      {areCommentsOpened && <CommentsLayout />}
       <AppBar />
       <ContentContainer>
         <PostButton onClick={openForm}>

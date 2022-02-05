@@ -45,3 +45,20 @@ const InnerContainer = styled.div`
 `
 
 export default PostContainer
+
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 0; right: 0;
+
+  font-size: 1.2em;
+  border: none;
+  background-color: var(--primary);
+  color: white;
+  font-weight: bold;
+  padding: 0.5em 1em;
+  border-radius: 0px 0px 0px 15px;
+
+  &:hover {
+    background-color: var(--darkprimary);
+  }
+`

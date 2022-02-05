@@ -1,11 +1,14 @@
-import { deleteDoc, doc, getDoc, getFirestore } from "firebase/firestore"
+import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, where, } from "firebase/firestore"
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
-import { AppState } from "../store"
+import { AppDispatch, AppState } from "../store"
+import { setOpenedComments, setPostId } from "../store/comments/actions"
 import { Post, Topic, UserData } from "../types"
 
 const PostLayout = ({ post }: {post: Post}) => {
+
+  const dispatch = useDispatch<AppDispatch>()
 
   const currentUser = useSelector((state: AppState) => {
     return state.auth.user
@@ -42,6 +45,21 @@ const PostLayout = ({ post }: {post: Post}) => {
     deleteDoc(doc(db, 'posts', post.id!)).catch(() => {
       alert('Failed to delete post!')
     })
+    const comments = collection(db, 'comments')
+    const postComments = query(
+      comments,
+      where('postId', '==', post.id)
+    )
+    getDocs(postComments).then(shot => {
+      shot.docs.forEach(doc => {
+        deleteDoc(doc.ref)
+      })
+    })
+  }
+
+  const openComments = () => {
+    dispatch(setPostId(post.id!))
+    dispatch(setOpenedComments(true))
   }
 
   return (
@@ -67,6 +85,7 @@ const PostLayout = ({ post }: {post: Post}) => {
             </FancyButton>
           )}
           <FancyButton
+            onClick={openComments}
             color="var(--primary)"
           >
             Comments
