@@ -1,9 +1,15 @@
-import { doc, getDoc, getFirestore } from "firebase/firestore"
+import { deleteDoc, doc, getDoc, getFirestore } from "firebase/firestore"
 import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 import styled from "styled-components"
+import { AppState } from "../store"
 import { Post, Topic, UserData } from "../types"
 
 const PostLayout = ({ post }: {post: Post}) => {
+
+  const currentUser = useSelector((state: AppState) => {
+    return state.auth.user
+  })
 
   const [topic, setTopic] = useState('')
   const [author, setAuthor] = useState<UserData | null>()
@@ -29,6 +35,15 @@ const PostLayout = ({ post }: {post: Post}) => {
     })
   }, [])
 
+  const removeThisPost = () => {
+    if(!window.confirm('Are you sure?'))
+      return
+    const db = getFirestore()
+    deleteDoc(doc(db, 'posts', post.id!)).catch(() => {
+      alert('Failed to delete post!')
+    })
+  }
+
   return (
     <Container>
       <div style={{marginBottom: '2em'}}>
@@ -41,7 +56,23 @@ const PostLayout = ({ post }: {post: Post}) => {
 
       <p>{post.postContent}</p>
 
-      <UserContainer> 
+      <UserContainer>
+        <Buttons>
+          {currentUser?.uid === post.authorUid && (
+            <FancyButton 
+              onClick={removeThisPost}
+              color="red"
+            >
+              Delete
+            </FancyButton>
+          )}
+          <FancyButton
+            color="var(--primary)"
+          >
+            Comments
+          </FancyButton>
+        </Buttons>
+
         <Icon src={author?.photoURL ?? ''}/>
         <div style={{fontSize: '0.7em'}}>
           <h3>{author?.displayName ?? 'Unknown'}</h3>
@@ -52,8 +83,27 @@ const PostLayout = ({ post }: {post: Post}) => {
   )
 }
 
+const Buttons = styled.div`
+  margin-right: auto;
+  & > * + * {
+    margin-left: 0.5em;
+  }
+`
+
+const FancyButton = styled.button<{color?:string}>`
+  border: none;
+  padding: 0.5em;
+  font-size: inherit;
+  border-radius: 5px;
+  transition: 0.25s all 0s;
+
+  &:hover {
+    color: white;
+    background-color: ${({color}) => color ?? 'grey'};
+  }
+`
+
 const Icon = styled.img`
-  margin-left: auto;
   height: 30px;
   border-radius: 100%;
 `

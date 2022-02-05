@@ -11,6 +11,8 @@ export interface Post {
   postContent: string
   authorUid: string
   createdAt: Timestamp
+
+  id?: string
 }
 
 export interface UserData {

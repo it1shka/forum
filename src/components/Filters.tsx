@@ -4,7 +4,7 @@ import { AppDispatch, AppState } from "../store"
 import { ChangeEvent, useEffect } from 'react'
 import { setPosts, setSelectedTopicId, setSortType } from "../store/feed/actions"
 import { SortType } from "../store/feed/types"
-import { collection, getDocs, getFirestore, orderBy, query, where } from "firebase/firestore"
+import { collection, onSnapshot, getFirestore, orderBy, query, where } from "firebase/firestore"
 import { Post } from "../types"
 
 const Filters = () => {
@@ -17,9 +17,9 @@ const Filters = () => {
     return state.feed
   })
 
-  const db = getFirestore()
-  const postsCollection = collection(db, 'posts')
   useEffect(() => {
+    const db = getFirestore()
+    const postsCollection = collection(db, 'posts')
     let postsQuery = query(postsCollection)
     if(selectedTopicId) {
       postsQuery = query(
@@ -36,16 +36,20 @@ const Filters = () => {
         : 'desc'
       )
     )
-    getDocs(postsQuery).then(snapshot => {
-      const posts = snapshot.docs.map(doc => {
-        return doc.data() as Post
+
+    const unsubscribe = onSnapshot(postsQuery, shot => {
+      const posts = shot.docs.map(doc => {
+        const post = {
+          ...doc.data(),
+          id: doc.id
+        } as Post
+        return post
       })
-      console.log(posts)
       dispatch(setPosts(posts))
-    }).catch(reason => {
-      console.error(reason)
-      alert('Failed to load posts!')
     })
+
+    return () => unsubscribe()
+    
   }, [sortType, selectedTopicId])
 
   const onTopicChange = (
